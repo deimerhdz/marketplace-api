@@ -8,6 +8,6 @@ ENTRYPOINT ["top", "-b"]
 
 FROM eclipse-temurin:21-jdk
 WORKDIR /app
-COPY --from=build /app/build/*.jar tauru_api.jar
+COPY --from=build app/build/libs/*.jar tauru_api.jar
 EXPOSE 8080
 ENTRYPOINT ["java", "-Dspring.profiles.active=prod","-jar","tauru_api.jar"]
