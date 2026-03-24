@@ -46,4 +46,7 @@ public class StrawEntity extends AuditableEntity {
     @JoinColumn(name = "bull_id", referencedColumnName = "id", insertable = false, updatable = false)
     private BullEntity bull;
 
+    @OneToOne(mappedBy = "straw")
+    private InventoryEntity inventory;
+
 }

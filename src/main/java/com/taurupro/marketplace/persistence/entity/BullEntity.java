@@ -71,4 +71,7 @@ public class BullEntity extends AuditableEntity {
     @JoinColumn(name = "breed_id",referencedColumnName = "id",insertable = false,updatable = false)
     private BreedEntity breed;
 
+    @OneToMany(mappedBy = "bull")
+    private List<StrawEntity> straws;
+
 }

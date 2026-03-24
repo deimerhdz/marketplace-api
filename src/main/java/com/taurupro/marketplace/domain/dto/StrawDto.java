@@ -8,6 +8,7 @@ import java.util.UUID;
 public record StrawDto(
         StrawType type,
         BigDecimal price,
-        Integer minOrder
+        Integer minOrder,
+        InventoryDto inventory
 ) {
 }
