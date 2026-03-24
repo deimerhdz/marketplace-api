@@ -11,10 +11,10 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/breeds")
-public class HelloController {
+public class BreedController {
     private final BreedService breedService;
 
-    public HelloController(BreedService breedService) {
+    public BreedController(BreedService breedService) {
         this.breedService = breedService;
     }
 
