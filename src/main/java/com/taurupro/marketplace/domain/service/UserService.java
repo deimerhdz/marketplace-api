@@ -51,7 +51,8 @@ public class UserService {
                 user.lastName(),
                 cognitoSub,
                 user.role(),
-                true
+                true,
+                null
         );
         createUser(userDto);
 
@@ -73,7 +74,8 @@ public class UserService {
                 admin.lastName(),
                 cognitoSub,
                 UserRole.ADMIN,
-                true
+                true,
+                null
         );
         createUser(userDto);
     }
@@ -148,7 +150,7 @@ public class UserService {
                 .map(UserDto::id)
                 .orElseThrow(() -> new IllegalStateException("User not found after creation"));
 
-        SupplierDto supplier = new SupplierDto(data.nit(), user.email(), data.phone(), data.legalName(), userId);
+        SupplierDto supplier = new SupplierDto(data.nit(), user.email(), data.phone(), data.legalName(), userId,null);
 
         supplierRepository.save(supplier);
     }

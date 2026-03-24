@@ -2,6 +2,7 @@ package com.taurupro.marketplace.persistence.model;
 
 import com.taurupro.marketplace.domain.dto.UserDto;
 import com.taurupro.marketplace.persistence.entity.UserEntity;
+import lombok.Getter;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,22 +10,28 @@ import org.springframework.security.core.userdetails.UserDetails;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.UUID;
 
 public class UserMain implements UserDetails {
     private String email;
     private String password;
+    @Getter
+    private final UUID supplierId;
 
     private Collection<? extends  GrantedAuthority> authorities;
 
-    public UserMain(String email, Collection<? extends GrantedAuthority> authorities) {
+    public UserMain(String email, UUID supplierId,Collection<? extends GrantedAuthority> authorities) {
         this.email = email;
+        this.supplierId=supplierId;
         this.authorities = authorities;
     }
 
     public static UserMain build(UserDto user){
         List<GrantedAuthority> authorities = Collections.singletonList(new SimpleGrantedAuthority(user.role().name()));
-
-        return new UserMain(user.email(),authorities);
+        UUID supplierId = user.supplier() != null
+                ? user.supplier().id()
+                : null;
+        return new UserMain(user.email(),supplierId,authorities);
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {

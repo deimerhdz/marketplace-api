@@ -7,6 +7,7 @@ public record SupplierDto(
         String email,
         String phone,
         String legalName,
-        UUID userId
+        UUID userId,
+        UUID id
 ) {
 }

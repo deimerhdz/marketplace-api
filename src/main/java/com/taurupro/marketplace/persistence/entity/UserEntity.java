@@ -46,4 +46,7 @@ public class UserEntity extends AuditableEntity{
     @Column(name = "cognito_sub", nullable = false)
     private String cognitoSub;
 
+    @OneToOne(mappedBy = "user")
+    private SupplierEntity supplier;
+
 }

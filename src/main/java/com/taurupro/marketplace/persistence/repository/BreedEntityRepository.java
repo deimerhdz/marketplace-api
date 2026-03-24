@@ -13,6 +13,7 @@ public class BreedEntityRepository implements BreedRepository {
 
     private final CrudBreedEntity crudBreedEntity;
 
+
     private final BreedMapper breedMapper;
 
     public BreedEntityRepository(CrudBreedEntity crudBreedEntity, BreedMapper breedMapper) {

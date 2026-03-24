@@ -11,6 +11,7 @@ public record UserDto(
          String lastName,
          String cognitoSub,
          UserRole role,
-         Boolean active
+         Boolean active,
+         SupplierDto supplier
 ) {
 }

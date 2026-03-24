@@ -45,4 +45,8 @@ public class SupplierEntity  extends AuditableEntity {
     @Column(name = "legal_name", nullable = false)
     private String legalName;
 
+    @OneToOne()
+    @JoinColumn(name = "user_id",referencedColumnName = "id",insertable = false,updatable = false)
+    private UserEntity user;
+
 }
