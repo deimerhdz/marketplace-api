@@ -8,4 +8,8 @@ import java.util.UUID;
 
 public interface CrudBullEntity extends ListCrudRepository<BullEntity, UUID> {
     Optional<BullEntity> findByIdAndSupplierId(UUID id, UUID supplierId);
+
+    Iterable<BullEntity> findByBreed_Name(String name);
+
+    Optional<BullEntity> findBySlug(String slug);
 }

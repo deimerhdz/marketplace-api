@@ -1,8 +1,6 @@
 package com.taurupro.marketplace.persistence.repository;
 
-import com.taurupro.marketplace.domain.dto.BullDto;
-import com.taurupro.marketplace.domain.dto.CreateBullDto;
-import com.taurupro.marketplace.domain.dto.UpdateBullDto;
+import com.taurupro.marketplace.domain.dto.*;
 import com.taurupro.marketplace.domain.repository.BullRepository;
 import com.taurupro.marketplace.persistence.crud.BullPagSortRepository;
 import com.taurupro.marketplace.persistence.crud.CrudBullEntity;
@@ -14,6 +12,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 
+import java.util.List;
 import java.util.UUID;
 
 @Repository
@@ -27,6 +26,17 @@ public class BullEntityRepository implements BullRepository {
         this.crudBullEntity = crudBullEntity;
         this.bullMapper = bullMapper;
         this.bullPagSortRepository = bullPagSortRepository;
+    }
+
+    @Override
+    public List<CatalogDto> getByBreedName(String  name) {
+        return this.bullMapper.toDto(this.crudBullEntity.findByBreed_Name(name));
+    }
+
+    @Override
+    public CatalogDetailDto getBySlug(String slug) {
+        BullEntity bullEntity =this.crudBullEntity.findBySlug(slug).orElse(null);
+        return this.bullMapper.toCatalog(bullEntity);
     }
 
     public Page<BullDto> getAll(int page, int elements, UUID supplierId) {
