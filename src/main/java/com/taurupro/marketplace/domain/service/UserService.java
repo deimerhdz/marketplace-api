@@ -85,26 +85,33 @@ public class UserService {
         authParams.put("USERNAME", loginDto.email());
         authParams.put("PASSWORD", loginDto.password());
 
-        InitiateAuthRequest initiateAuthRequest = new InitiateAuthRequest()
-                .withAuthFlow(AuthFlowType.USER_PASSWORD_AUTH)
-                .withClientId(clientId)
-                .withAuthParameters(authParams);
-        InitiateAuthResult authResult = awsCognitoIdentityProvider.initiateAuth(initiateAuthRequest);
-        System.out.println(authResult.getChallengeName());
-        if ("NEW_PASSWORD_REQUIRED".equals(authResult.getChallengeName())) {
-            return new AuthResponseDto(
-                    "NEW_PASSWORD_REQUIRED",
-                    null,
-                    authResult.getSession()  // el frontend debe guardar esta session
-            );
-        }
+        try {
+            InitiateAuthRequest request = new InitiateAuthRequest()
+                    .withAuthFlow(AuthFlowType.USER_PASSWORD_AUTH)
+                    .withClientId(clientId)
+                    .withAuthParameters(authParams);
 
-        // Login exitoso
-        return new AuthResponseDto(
-                "SUCCESS",
-                authResult.getAuthenticationResult().getAccessToken(),
-                null
-        );
+            InitiateAuthResult authResult =
+                    awsCognitoIdentityProvider.initiateAuth(request);
+
+            if ("NEW_PASSWORD_REQUIRED".equals(authResult.getChallengeName())) {
+                return new AuthResponseDto(
+                        "NEW_PASSWORD_REQUIRED",
+                        null,
+                        authResult.getSession()
+                );
+            }
+
+            return new AuthResponseDto(
+                    "SUCCESS",
+                    authResult.getAuthenticationResult().getAccessToken(),
+                    null
+            );
+
+        } catch (NotAuthorizedException e) {
+            // 👇 Usuario o contraseña incorrectos
+            throw new RuntimeException("Credenciales inválidas");
+        }
     }
 
     public AuthResponseDto confirmNewPassword(ConfirmPasswordDto dto) {
