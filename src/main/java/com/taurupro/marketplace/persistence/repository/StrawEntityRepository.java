@@ -6,6 +6,7 @@ import com.taurupro.marketplace.domain.dto.UpdateStrawDto;
 import com.taurupro.marketplace.domain.repository.StrawRepository;
 import com.taurupro.marketplace.persistence.crud.CrudInventoryEntity;
 import com.taurupro.marketplace.persistence.crud.CrudStrawEntity;
+import com.taurupro.marketplace.persistence.entity.BullEntity;
 import com.taurupro.marketplace.persistence.entity.InventoryEntity;
 import com.taurupro.marketplace.persistence.entity.StrawEntity;
 import com.taurupro.marketplace.persistence.mapper.InventoryMapper;
@@ -14,6 +15,7 @@ import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Repository
@@ -34,6 +36,13 @@ public class StrawEntityRepository implements StrawRepository {
         this.crudStrawEntity = crudStrawEntity;
         this.crudInventoryEntity=crudInventoryEntity;
     }
+
+    @Override
+    public Optional<StrawDto> findById(UUID id) {
+
+        return this.crudStrawEntity.findById(id).map(this.strawMapper::toDto);
+    }
+
     @Transactional
     @Override
     public void save(CreateStrawDto createStrawDto) {

@@ -1,0 +1,1 @@
+ALTER TABLE orders ADD COLUMN address JSONB NOT NULL DEFAULT '{}';

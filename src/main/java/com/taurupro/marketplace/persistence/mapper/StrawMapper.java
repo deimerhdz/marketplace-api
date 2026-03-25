@@ -11,7 +11,9 @@ import java.util.List;
 @Mapper(componentModel = "spring")
 public interface StrawMapper {
     StrawDto toDto(StrawEntity entity);
+
     List<StrawDto> toDto(Iterable<StrawEntity> entities);
+
     @InheritInverseConfiguration
     StrawEntity toEntity(StrawDto dto);
 
@@ -19,5 +21,5 @@ public interface StrawMapper {
     StrawEntity toEntity(CreateStrawDto dto);
 
 
-    void updateEntityFromDto(UpdateStrawDto updateStrawDto , @MappingTarget StrawEntity strawEntity);
+    void updateEntityFromDto(UpdateStrawDto updateStrawDto, @MappingTarget StrawEntity strawEntity);
 }

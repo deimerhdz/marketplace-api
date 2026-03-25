@@ -13,6 +13,8 @@ import java.util.List;
 import java.util.UUID;
 
 public class UserMain implements UserDetails {
+    @Getter
+    private final UUID id;
     private String email;
     private String password;
     @Getter
@@ -20,7 +22,8 @@ public class UserMain implements UserDetails {
 
     private Collection<? extends  GrantedAuthority> authorities;
 
-    public UserMain(String email, UUID supplierId,Collection<? extends GrantedAuthority> authorities) {
+    public UserMain(UUID id,String email, UUID supplierId,Collection<? extends GrantedAuthority> authorities) {
+        this.id=id;
         this.email = email;
         this.supplierId=supplierId;
         this.authorities = authorities;
@@ -31,7 +34,7 @@ public class UserMain implements UserDetails {
         UUID supplierId = user.supplier() != null
                 ? user.supplier().id()
                 : null;
-        return new UserMain(user.email(),supplierId,authorities);
+        return new UserMain(user.id(),user.email(),supplierId,authorities);
     }
     @Override
     public Collection<? extends GrantedAuthority> getAuthorities() {
