@@ -21,6 +21,4 @@ public abstract class AuditableEntity {
     @Column(name = "updated_at")
     protected LocalDateTime updatedAt;
 
-    @Column(name = "deleted_at")
-    protected LocalDateTime deletedAt;
 }
