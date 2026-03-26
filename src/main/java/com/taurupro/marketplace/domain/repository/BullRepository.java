@@ -1,6 +1,7 @@
 package com.taurupro.marketplace.domain.repository;
 
 import com.taurupro.marketplace.domain.dto.*;
+import com.taurupro.marketplace.persistence.model.MediaFile;
 import org.springframework.data.domain.Page;
 
 import java.util.List;
@@ -20,4 +21,6 @@ public interface BullRepository {
     BullDto save(UUID supplierId, CreateBullDto createBullDto);
 
     BullDto update(UUID id, UUID supplierId, UpdateBullDto bullDto);
+
+    BullDto updateImage(UUID id, UUID supplierId, MediaFile image);
 }

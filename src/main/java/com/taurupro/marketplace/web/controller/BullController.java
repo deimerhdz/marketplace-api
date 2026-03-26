@@ -1,5 +1,6 @@
 package com.taurupro.marketplace.web.controller;
 
+import com.taurupro.marketplace.domain.dto.UpdateBullImageDto;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.Page;
@@ -64,5 +65,19 @@ public class BullController {
                                           @AuthenticationPrincipal UserMain userMain) {
         UUID supplierId = userMain.getSupplierId();
         return ResponseEntity.status(HttpStatus.CREATED).body(this.bullService.update(id, supplierId, updateMovieDto));
+    }
+
+
+    @PutMapping("/image/{id}")
+    @PreAuthorize("hasAuthority('SUPPLIER')")
+    public ResponseEntity<BullDto> updateImage(@PathVariable UUID id,
+                                               @RequestBody @Valid UpdateBullImageDto dto,
+                                               @AuthenticationPrincipal UserMain userMain) {
+
+        UUID supplierId = userMain.getSupplierId();
+
+        BullDto updated = bullService.updateImage(id, supplierId, dto);
+
+        return ResponseEntity.ok(updated);
     }
 }

@@ -36,19 +36,21 @@ public class FileService {
     /**
      * Genera una URL pre-firmada para operaciones GET o PUT con el tipo de acceso especificado.
      */
-    public String generatePreSignedUrl(String filePath, SdkHttpMethod method) {
+    public String generatePreSignedUrl(String filePath,String fileName ,String contentType ,SdkHttpMethod method) {
 
-        return generatePutPresignedUrl(buildFilename(filePath));
+        System.out.println("KEY FINAL: " + filePath + buildFilename(fileName));
+        return generatePutPresignedUrl(filePath+buildFilename(fileName),contentType);
 
     }
 
     /**
      * Generates a presigned PUT URL with optional ACL based on AccessType.
      */
-    private String generatePutPresignedUrl(String filePath) {
+    private String generatePutPresignedUrl(String filePath,String contentType) {
         PutObjectRequest.Builder putObjectRequestBuilder = PutObjectRequest.builder()
                 .bucket(bucketName)
-                .key(filePath);
+                .key(filePath)
+                .contentType(contentType);
 
 
         PutObjectRequest putObjectRequest = putObjectRequestBuilder.build();

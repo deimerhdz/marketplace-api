@@ -4,6 +4,7 @@ import com.taurupro.marketplace.domain.dto.*;
 import com.taurupro.marketplace.persistence.entity.StrawEntity;
 import org.mapstruct.InheritInverseConfiguration;
 import org.mapstruct.Mapper;
+import org.mapstruct.Mapping;
 import org.mapstruct.MappingTarget;
 
 import java.util.List;
@@ -15,9 +16,11 @@ public interface StrawMapper {
     List<StrawDto> toDto(Iterable<StrawEntity> entities);
 
     @InheritInverseConfiguration
+
     StrawEntity toEntity(StrawDto dto);
 
     @InheritInverseConfiguration
+    @Mapping(target = "inventory", ignore = true)
     StrawEntity toEntity(CreateStrawDto dto);
 
 
