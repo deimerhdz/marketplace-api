@@ -3,6 +3,7 @@ package com.taurupro.marketplace.domain.dto;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 
+import java.util.List;
 import java.util.UUID;
 
 public record BullDto(
@@ -19,6 +20,9 @@ public record BullDto(
         @NotNull
         BreedDto breed,
         @NotNull
-        UUID supplierId
+        UUID supplierId,
+
+        MediaFileDto image
+
 ) {
 }

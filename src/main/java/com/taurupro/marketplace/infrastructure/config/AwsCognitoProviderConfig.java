@@ -10,10 +10,10 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 public class AwsCognitoProviderConfig {
-    @Value(value = "${aws.secret.key}")
+    @Value("${aws.accessKey}")
     private String accessKey;
 
-    @Value(value = "${aws.access.key}")
+    @Value("${aws.secretKey}")
     private String secretKey;
 
     @Value(value = "${aws.region}")

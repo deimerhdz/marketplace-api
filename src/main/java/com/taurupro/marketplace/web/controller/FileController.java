@@ -1,6 +1,5 @@
 package com.taurupro.marketplace.web.controller;
 
-import com.taurupro.marketplace.domain.enums.AccessType;
 import com.taurupro.marketplace.domain.service.FileService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -24,9 +23,11 @@ public class FileController {
     @PostMapping("/pre-signed-url")
     @PreAuthorize("hasAnyAuthority('SUPPLIER', 'ADMIN')")
     public ResponseEntity<Map<String, Object>> generateUrl(
-            @RequestParam(name = "filename", required = false, defaultValue = "") String filename) {
+            @RequestParam(name = "filePath", required = false, defaultValue = "") String filePath,
+            @RequestParam(name = "filename", required = false, defaultValue = "") String filename,
+            @RequestParam(name = "contentType", required = false, defaultValue = "") String contentType) {
 
-        String url = fileService.generatePreSignedUrl(filename, SdkHttpMethod.PUT );
+        String url = fileService.generatePreSignedUrl(filePath,filename,contentType, SdkHttpMethod.PUT );
         return ResponseEntity.ok(Map.of("url", url, "file", filename));
     }
 }

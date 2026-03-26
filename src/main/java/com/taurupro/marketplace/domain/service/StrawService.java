@@ -20,8 +20,8 @@ public class StrawService {
     public List<StrawDto> list(UUID bullId) {
       return  this.strawRepository.list(bullId);
     }
-    public void save(CreateStrawDto createBullDto) {
-        this.strawRepository.save(createBullDto);
+    public void save(CreateStrawDto createStrawDto) {
+        this.strawRepository.save(createStrawDto);
     }
 
     public void update(UUID id, UpdateStrawDto updateStrawDto) {

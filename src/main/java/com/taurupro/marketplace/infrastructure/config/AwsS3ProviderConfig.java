@@ -12,10 +12,10 @@ import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 @Configuration
 public class AwsS3ProviderConfig {
 
-    @Value("${aws.access.key}")
+    @Value("${aws.accessKey}")
     private String accessKey;
 
-    @Value("${aws.secret.key}")
+    @Value("${aws.secretKey}")
     private String secretKey;
 
     @Value("${aws.region}")
@@ -24,6 +24,8 @@ public class AwsS3ProviderConfig {
     @Bean
     public S3Client s3Client() {
         Region awsRegion = Region.of(region);
+        System.out.println("accesskey ->"+accessKey);
+        System.out.println("secretkey ->"+secretKey);
         AwsBasicCredentials awsCredentials = AwsBasicCredentials.create(accessKey, secretKey);
         return S3Client.builder()
                 .region(awsRegion)

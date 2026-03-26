@@ -6,6 +6,7 @@ import com.taurupro.marketplace.persistence.crud.BullPagSortRepository;
 import com.taurupro.marketplace.persistence.crud.CrudBullEntity;
 import com.taurupro.marketplace.persistence.entity.BullEntity;
 import com.taurupro.marketplace.persistence.mapper.BullMapper;
+import com.taurupro.marketplace.persistence.model.MediaFile;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -68,6 +69,16 @@ public class BullEntityRepository implements BullRepository {
         if (bullEntity == null) return null;
 
         this.bullMapper.updateEntityFromDto(updateBullDto, bullEntity);
+
+        return this.bullMapper.toDto(this.crudBullEntity.save(bullEntity));
+    }
+
+    @Override
+    public BullDto updateImage(UUID id, UUID supplierId, MediaFile image) {
+        BullEntity bullEntity = this.crudBullEntity.findByIdAndSupplierId(id, supplierId).orElse(null);
+        if (bullEntity == null) return null;
+
+        bullEntity.setImage(image);
 
         return this.bullMapper.toDto(this.crudBullEntity.save(bullEntity));
     }
