@@ -32,7 +32,7 @@ public class MainSecurity {
 
         http.cors( cors-> cors.configurationSource(request -> {
                     CorsConfiguration config  = new CorsConfiguration();
-                    config .setAllowedOrigins(List.of("http://localhost:4200"));
+                    config .setAllowedOrigins(List.of("http://localhost:4200","https://taurupro.netlify.app"));
                     config .setAllowedMethods(List.of("HEAD","GET","POST","PUT","DELETE"));
                     config .setAllowCredentials(true);
                     config .addExposedHeader("Message");
