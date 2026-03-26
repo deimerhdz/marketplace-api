@@ -2,18 +2,19 @@ package com.taurupro.marketplace.domain.service;
 
 import com.amazonaws.services.cognitoidp.AWSCognitoIdentityProvider;
 import com.amazonaws.services.cognitoidp.model.*;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.taurupro.marketplace.domain.dto.*;
 import com.taurupro.marketplace.domain.enums.UserRole;
 import com.taurupro.marketplace.domain.repository.SupplierRepository;
 import com.taurupro.marketplace.domain.repository.UserRepository;
 import com.taurupro.marketplace.persistence.entity.SupplierEntity;
+import jakarta.annotation.Nonnull;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Service
 public class UserService {
@@ -39,7 +40,7 @@ public class UserService {
     public void createUser(UserDto userDto) {
         this.userRepository.save(userDto);
     }
-
+    @Transactional
     public void signUpUser(SignUpUser user) {
         // 1. Crear usuario en Cognito con contraseña temporal
         String cognitoSub = createCognitoUserWithTempPassword(user);
@@ -80,7 +81,7 @@ public class UserService {
         createUser(userDto);
     }
 
-    public AuthResponseDto  signInUser(LoginDto loginDto) {
+    public AuthResponseDto signInUser(LoginDto loginDto) {
         final Map<String, String> authParams = new HashMap<>();
         authParams.put("USERNAME", loginDto.email());
         authParams.put("PASSWORD", loginDto.password());
@@ -93,24 +94,68 @@ public class UserService {
 
             InitiateAuthResult authResult =
                     awsCognitoIdentityProvider.initiateAuth(request);
-
+            UserAuthDto user = getUserAuthDto(loginDto.email());
             if ("NEW_PASSWORD_REQUIRED".equals(authResult.getChallengeName())) {
                 return new AuthResponseDto(
                         "NEW_PASSWORD_REQUIRED",
                         null,
-                        authResult.getSession()
+                        null, authResult.getSession(),null
                 );
             }
 
             return new AuthResponseDto(
                     "SUCCESS",
                     authResult.getAuthenticationResult().getAccessToken(),
-                    null
+                    authResult.getAuthenticationResult().getRefreshToken(),
+                    null,user
+
             );
 
         } catch (NotAuthorizedException e) {
-            // 👇 Usuario o contraseña incorrectos
             throw new RuntimeException("Credenciales inválidas");
+        }
+    }
+
+
+    private UserAuthDto getUserAuthDto(String email) {
+        UserDto userDto =  findByEmail(email) .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+        return new UserAuthDto(userDto.name(),userDto.lastName(),userDto.role());
+    }
+
+    public AuthResponseDto refreshToken(String refreshToken) {
+        final Map<String, String> authParams = new HashMap<>();
+        authParams.put("REFRESH_TOKEN", refreshToken);
+
+        try {
+            InitiateAuthRequest request = new InitiateAuthRequest()
+                    .withAuthFlow(AuthFlowType.REFRESH_TOKEN_AUTH) // 👈 Flujo de refresco
+                    .withClientId(clientId)
+                    .withAuthParameters(authParams);
+
+            InitiateAuthResult authResult =
+                    awsCognitoIdentityProvider.initiateAuth(request);
+
+            AuthenticationResultType result = authResult.getAuthenticationResult();
+
+            // Cognito no devuelve un nuevo refresh token siempre,
+            // se reutiliza el mismo si no viene uno nuevo
+            String newRefreshToken = result.getRefreshToken() != null
+                    ? result.getRefreshToken()
+                    : refreshToken;
+
+            // Extraer el email del access token para buscar el usuario
+            String cognitoSub = extractCognitoSubFromToken(result.getAccessToken());
+          UserDto userDto =  findByCognitoSub(cognitoSub).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            return new AuthResponseDto(
+                    "SUCCESS",
+                    result.getAccessToken(),
+                    newRefreshToken,
+                    null,new UserAuthDto(userDto.name(),userDto.lastName(),userDto.role())
+
+            );
+
+        } catch (NotAuthorizedException e) {
+            throw new RuntimeException("Refresh token inválido o expirado");
         }
     }
 
@@ -129,10 +174,13 @@ public class UserService {
         AdminRespondToAuthChallengeResult result =
                 awsCognitoIdentityProvider.adminRespondToAuthChallenge(challengeRequest);
 
+        UserAuthDto user = getUserAuthDto(dto.email());
+
         return new AuthResponseDto(
                 "SUCCESS",
                 result.getAuthenticationResult().getAccessToken(),
-                null
+                result.getAuthenticationResult().getRefreshToken(), null,
+                user
         );
     }
 
@@ -157,7 +205,7 @@ public class UserService {
                 .map(UserDto::id)
                 .orElseThrow(() -> new IllegalStateException("User not found after creation"));
 
-        SupplierDto supplier = new SupplierDto(data.nit(), user.email(), data.phone(), data.legalName(), userId,null);
+        SupplierDto supplier = new SupplierDto(data.nit(), user.email(), data.phone(), data.legalName(), userId, null);
 
         supplierRepository.save(supplier);
     }
@@ -235,5 +283,17 @@ public class UserService {
                 .findFirst()
                 .map(AttributeType::getValue)
                 .orElseThrow(() -> new IllegalStateException("Sub not found after admin creation"));
+    }
+
+    private String extractCognitoSubFromToken(String accessToken) {
+        String[] parts = accessToken.split("\\.");
+        String payload = new String(Base64.getUrlDecoder().decode(parts[1]));
+        // Usa ObjectMapper o JsonParser según tu proyecto
+        try {
+            JsonNode node = new ObjectMapper().readTree(payload);
+            return node.get("username").asText(); // campo en Cognito
+        } catch (Exception e) {
+            throw new RuntimeException("Error al decodificar el token");
+        }
     }
 }

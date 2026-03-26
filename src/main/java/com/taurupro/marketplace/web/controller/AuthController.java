@@ -3,11 +3,13 @@ package com.taurupro.marketplace.web.controller;
 import com.taurupro.marketplace.domain.dto.*;
 import com.taurupro.marketplace.domain.service.UserDetailsServiceImpl;
 import com.taurupro.marketplace.domain.service.UserService;
+import com.taurupro.marketplace.persistence.model.UserMain;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
@@ -51,13 +53,22 @@ public class AuthController {
                 .body(new ResponseMessgeDto("Se ha registrado el usuario con éxito"));
     }
 
-    @GetMapping("/user-deatils")
-    ResponseEntity<Optional<UserDto>> getUserDeatils(){
-        UserDetails userDetails = (UserDetails) SecurityContextHolder.getContext().getAuthentication().getPrincipal();
-        String email = userDetails.getUsername();
+    @GetMapping("/refresh")
+    public ResponseEntity<AuthResponseDto> refresh(
+            @RequestHeader("Authorization") String authHeader) {
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(userService.findByEmail(email));
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
+        }
+        String refreshToken = authHeader.substring(7);
+        AuthResponseDto response = userService.refreshToken(refreshToken);
+        return ResponseEntity.ok(response);
+    }
+    @GetMapping("/me")
+    public ResponseEntity<UserAuthDto> refresh(
+            @AuthenticationPrincipal UserMain userMain) {
+        UserDto userDto = userService.findByEmail(userMain.getUsername()).orElseThrow(() -> new RuntimeException("Usuario no encontrado"));;
+        return ResponseEntity.ok(new UserAuthDto(userDto.name(),userDto.lastName(),userDto.role()));
     }
 
     @PostMapping("/confirm-password")

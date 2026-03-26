@@ -13,7 +13,6 @@ public record SignUpUser(
         String lastName,
         @NotNull(message = "El rol es obligatorio.")
         UserRole role,
-
         CreateSupplierDto supplier
 ) {
 }
