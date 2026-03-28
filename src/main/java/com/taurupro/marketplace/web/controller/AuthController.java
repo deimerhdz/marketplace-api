@@ -34,24 +34,18 @@ public class AuthController {
 
     @PostMapping("/login")
     public ResponseEntity<AuthResponseDto> login(@Valid @RequestBody LoginDto request) {
-        AuthResponseDto response = userService.signInUser(request);
-
-        UserDetails userDetails = userDetailsService.loadUserByUsername(request.email());
-        UsernamePasswordAuthenticationToken authentication =
-                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-        SecurityContextHolder.getContext().setAuthentication(authentication);
-
+        AuthResponseDto response = authenticate(request.email(), request.password());
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/register")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public ResponseEntity<ResponseMessgeDto> register(@Valid @RequestBody SignUpUser request) {
-        userService.signUpUser(request);
+    public ResponseEntity<AuthResponseDto> register(@Valid @RequestBody SingUpCustomerDto request) {
+        userService.signUpCustomer(request);
 
-        return ResponseEntity.status(HttpStatus.OK)
-                .body(new ResponseMessgeDto("Se ha registrado el usuario con éxito"));
+        AuthResponseDto response = authenticate(request.email(), request.password());
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
+
 
     @GetMapping("/refresh")
     public ResponseEntity<AuthResponseDto> refresh(
@@ -64,6 +58,7 @@ public class AuthController {
         AuthResponseDto response = userService.refreshToken(refreshToken);
         return ResponseEntity.ok(response);
     }
+
     @GetMapping("/me")
     public ResponseEntity<UserAuthDto> refresh(
             @AuthenticationPrincipal UserMain userMain) {
@@ -74,5 +69,16 @@ public class AuthController {
     @PostMapping("/confirm-password")
     public ResponseEntity<AuthResponseDto> confirmPassword(@RequestBody @Valid ConfirmPasswordDto dto) {
         return ResponseEntity.ok(userService.confirmNewPassword(dto));
+    }
+
+    private AuthResponseDto authenticate(String email, String password) {
+        AuthResponseDto response = userService.signInUser(new LoginDto(email, password));
+
+        UserDetails userDetails = userDetailsService.loadUserByUsername(email);
+        UsernamePasswordAuthenticationToken authentication =
+                new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+        SecurityContextHolder.getContext().setAuthentication(authentication);
+
+        return response;
     }
 }

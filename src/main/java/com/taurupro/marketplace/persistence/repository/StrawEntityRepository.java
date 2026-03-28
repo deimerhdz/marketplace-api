@@ -3,10 +3,10 @@ package com.taurupro.marketplace.persistence.repository;
 import com.taurupro.marketplace.domain.dto.CreateStrawDto;
 import com.taurupro.marketplace.domain.dto.StrawDto;
 import com.taurupro.marketplace.domain.dto.UpdateStrawDto;
+import com.taurupro.marketplace.domain.enums.StrawType;
 import com.taurupro.marketplace.domain.repository.StrawRepository;
 import com.taurupro.marketplace.persistence.crud.CrudInventoryEntity;
 import com.taurupro.marketplace.persistence.crud.CrudStrawEntity;
-import com.taurupro.marketplace.persistence.entity.BullEntity;
 import com.taurupro.marketplace.persistence.entity.InventoryEntity;
 import com.taurupro.marketplace.persistence.entity.StrawEntity;
 import com.taurupro.marketplace.persistence.mapper.InventoryMapper;
@@ -41,6 +41,11 @@ public class StrawEntityRepository implements StrawRepository {
     public Optional<StrawDto> findById(UUID id) {
 
         return this.crudStrawEntity.findById(id).map(this.strawMapper::toDto);
+    }
+
+    @Override
+    public Optional<StrawDto> findByType(StrawType type,UUID bullId) {
+        return this.crudStrawEntity.findByTypeAndBullId(type,bullId).map(this.strawMapper::toDto) ;
     }
 
     @Transactional

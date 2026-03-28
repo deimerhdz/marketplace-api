@@ -2,6 +2,7 @@ package com.taurupro.marketplace.web.exception;
 
 import com.taurupro.marketplace.domain.exception.IdempotencyConflictException;
 import com.taurupro.marketplace.domain.exception.RequestStillProcessingException;
+import com.taurupro.marketplace.domain.exception.StrawAlreadyExistsException;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -27,6 +28,14 @@ public class GlobalExceptionHandler {
     public ResponseEntity<Map<String, String>> handleProcessing(RequestStillProcessingException ex) {
         // 409: pedir reintento con backoff
         return ResponseEntity.status(HttpStatus.CONFLICT)
+                .header("Retry-After", "2")
+                .body(Map.of("error", ex.getMessage()));
+    }
+
+    @ExceptionHandler(StrawAlreadyExistsException.class)
+    public ResponseEntity<Map<String, String>> handleProcessing(StrawAlreadyExistsException ex) {
+        // 409: pedir reintento con backoff
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST)
                 .header("Retry-After", "2")
                 .body(Map.of("error", ex.getMessage()));
     }
