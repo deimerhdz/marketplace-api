@@ -8,9 +8,8 @@ import com.taurupro.marketplace.domain.dto.*;
 import com.taurupro.marketplace.domain.enums.UserRole;
 import com.taurupro.marketplace.domain.repository.SupplierRepository;
 import com.taurupro.marketplace.domain.repository.UserRepository;
-import com.taurupro.marketplace.persistence.entity.SupplierEntity;
-import jakarta.annotation.Nonnull;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.data.domain.Page;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -37,9 +36,14 @@ public class UserService {
         this.supplierRepository = supplierRepository;
     }
 
+    public Page<UserDto> getAll(int page, int elements){
+        return this.userRepository.getAll(page, elements);
+    }
+
     public void createUser(UserDto userDto) {
         this.userRepository.save(userDto);
     }
+
     @Transactional
     public void signUpUser(SignUpUser user) {
         // 1. Crear usuario en Cognito con contraseña temporal
@@ -61,6 +65,23 @@ public class UserService {
         if (user.role() == UserRole.SUPPLIER) {
             registerSupplier(user);
         }
+    }
+  public void signUpCustomer(SingUpCustomerDto user) {
+        // 1. Crear usuario en Cognito con contraseña temporal
+        String cognitoSub = createCognitoCustomer(user);
+        // 2. Persistir usuario en base de datos
+        UserDto userDto = new UserDto(
+                null,
+                user.email(),
+                user.name(),
+                user.lastName(),
+                cognitoSub,
+                UserRole.CUSTOMER,
+                true,
+                null
+        );
+        createUser(userDto);
+
     }
 
     public void createAdminUser(SignUpAdmin admin) {
@@ -205,9 +226,51 @@ public class UserService {
                 .map(UserDto::id)
                 .orElseThrow(() -> new IllegalStateException("User not found after creation"));
 
-        SupplierDto supplier = new SupplierDto(data.nit(), user.email(), data.phone(), data.legalName(), userId, null);
+        SupplierDto supplier = new SupplierDto(data.nit(), user.email(), data.phone(), data.legalName(), null,userId, null);
 
         supplierRepository.save(supplier);
+    }
+    private String createCognitoCustomer(SingUpCustomerDto user) {
+        AttributeType emailAttribute = new AttributeType()
+                .withName("email")
+                .withValue(user.email());
+
+        AttributeType emailVerifiedAttribute = new AttributeType()
+                .withName("email_verified")
+                .withValue("true");
+
+        AttributeType firstNameAttribute = new AttributeType()
+                .withName("given_name")
+                .withValue(user.name()); // o como se llame en tu DTO
+
+        AttributeType lastNameAttribute = new AttributeType()
+                .withName("family_name")
+                .withValue(user.lastName());
+
+        AdminCreateUserRequest request = new AdminCreateUserRequest()
+                .withUserPoolId(userPoolId)
+                .withUsername(user.email())
+
+                .withMessageAction("SUPPRESS")
+                .withUserAttributes(
+                        emailAttribute,
+                        emailVerifiedAttribute,
+                        firstNameAttribute,
+                        lastNameAttribute);
+
+        AdminCreateUserResult createUserResult = awsCognitoIdentityProvider.adminCreateUser(request);
+        // 2. Asignar contraseña definitiva
+        AdminSetUserPasswordRequest passwordRequest = new AdminSetUserPasswordRequest()
+                .withUserPoolId(userPoolId)
+                .withUsername(user.email())
+                .withPassword(user.password())
+                .withPermanent(true);
+        awsCognitoIdentityProvider.adminSetUserPassword(passwordRequest);
+        return createUserResult.getUser().getAttributes().stream()
+                .filter(attr -> attr.getName().equals("sub"))
+                .findFirst()
+                .map(AttributeType::getValue)
+                .orElseThrow(() -> new IllegalStateException("Sub not found after user creation"));
     }
 
     private String createCognitoUserWithTempPassword(SignUpUser user) {

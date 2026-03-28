@@ -40,7 +40,7 @@ public class MainSecurity {
                     return config ;
                 })).csrf(csrf->csrf.disable())
                 .authorizeHttpRequests(
-                        auth->auth.requestMatchers("/catalog/**","/auth/refresh","/breeds","/auth/login","/auth/confirm-password").permitAll().anyRequest().authenticated()
+                        auth->auth.requestMatchers("/catalog/**","/auth/refresh","/breeds","/auth/register","/auth/login","/auth/confirm-password").permitAll().anyRequest().authenticated()
                 )
                 .exceptionHandling(auth->auth.authenticationEntryPoint(jwtEntryPoint))
                 .sessionManagement(session->session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));

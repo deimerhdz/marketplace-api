@@ -3,8 +3,12 @@ package com.taurupro.marketplace.persistence.repository;
 import com.taurupro.marketplace.domain.dto.UserDto;
 import com.taurupro.marketplace.domain.repository.UserRepository;
 import com.taurupro.marketplace.persistence.crud.CrudUserEntity;
+import com.taurupro.marketplace.persistence.crud.UserPagSortRepository;
 import com.taurupro.marketplace.persistence.entity.UserEntity;
 import com.taurupro.marketplace.persistence.mapper.UserMapper;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Repository;
 
 import java.util.Optional;
@@ -12,12 +16,20 @@ import java.util.Optional;
 @Repository
 public class UserEntityRepository implements UserRepository {
     private final CrudUserEntity crudUserEntity;
+    private final UserPagSortRepository userPagSortRepository;
 
     private final UserMapper userMapper;
 
-    public UserEntityRepository(CrudUserEntity crudUserEntity, UserMapper userMapper) {
+    public UserEntityRepository(CrudUserEntity crudUserEntity, UserMapper userMapper,UserPagSortRepository userPagSortRepository) {
         this.crudUserEntity = crudUserEntity;
         this.userMapper = userMapper;
+        this.userPagSortRepository=userPagSortRepository;
+    }
+
+    @Override
+    public Page<UserDto> getAll(int page, int elements) {
+        Pageable pageRequest = (Pageable) PageRequest.of(page, elements);
+        return this.userPagSortRepository.findAll(pageRequest).map(this.userMapper::toDto);
     }
 
     @Override
