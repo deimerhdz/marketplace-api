@@ -1,20 +1,14 @@
 package com.taurupro.marketplace.domain.service;
 
-import com.taurupro.marketplace.domain.enums.AccessType;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
-import software.amazon.awssdk.core.sync.RequestBody;
 import software.amazon.awssdk.http.SdkHttpMethod;
 import software.amazon.awssdk.services.s3.S3Client;
-import software.amazon.awssdk.services.s3.model.ObjectCannedACL;
+import software.amazon.awssdk.services.s3.model.DeleteObjectRequest;
 import software.amazon.awssdk.services.s3.model.PutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.S3Presigner;
 import software.amazon.awssdk.services.s3.presigner.model.PresignedPutObjectRequest;
 import software.amazon.awssdk.services.s3.presigner.model.PutObjectPresignRequest;
-
-import java.io.IOException;
-import java.io.InputStream;
 import java.text.Normalizer;
 import java.time.Duration;
 
@@ -27,9 +21,9 @@ public class FileService {
 
     private final S3Presigner s3Presigner;
 
-
-    public FileService(S3Presigner s3Presigner) {
-
+    private final S3Client s3Client;
+    public FileService(S3Presigner s3Presigner,S3Client s3Client) {
+        this.s3Client=  s3Client;
         this.s3Presigner = s3Presigner;
     }
 
@@ -38,9 +32,17 @@ public class FileService {
      */
     public String generatePreSignedUrl(String filePath,String fileName ,String contentType ,SdkHttpMethod method) {
 
-        System.out.println("KEY FINAL: " + filePath + buildFilename(fileName));
         return generatePutPresignedUrl(filePath+buildFilename(fileName),contentType);
 
+    }
+
+    public void deleteFile(String key) {
+        DeleteObjectRequest deleteRequest = DeleteObjectRequest.builder()
+                .bucket(bucketName)
+                .key(key)
+                .build();
+
+        s3Client.deleteObject(deleteRequest);
     }
 
     /**

@@ -25,4 +25,8 @@ public class CatalogController {
     public ResponseEntity<CatalogDetailDto> getDetailBySlug(@PathVariable() String slug){
         return ResponseEntity.ok(this.catalogService.getDetailBySlug(slug));
     }
+    @GetMapping("/recent")
+    public ResponseEntity<List<CatalogDto>> getBullRecents(@RequestParam(defaultValue = "10") Integer limit){
+        return ResponseEntity.ok(this.catalogService.getRecentBulls(limit));
+    }
 }

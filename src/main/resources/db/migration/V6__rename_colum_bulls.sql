@@ -1,0 +1,1 @@
+ALTER TABLE bulls RENAME COLUMN pedigree TO genetic_evaluation;

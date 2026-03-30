@@ -4,7 +4,7 @@ import java.util.List;
 public record CatalogDetailDto(
         String name,
         String slug,
-        String stud,
+        String numRegister,
         BreedDto breed,
         String birthDate,
         Boolean isFeature,

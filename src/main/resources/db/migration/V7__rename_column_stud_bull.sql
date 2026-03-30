@@ -1,0 +1,1 @@
+ALTER TABLE bulls RENAME COLUMN stud TO num_register;

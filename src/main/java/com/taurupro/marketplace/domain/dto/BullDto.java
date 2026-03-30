@@ -2,6 +2,7 @@ package com.taurupro.marketplace.domain.dto;
 
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+import jakarta.validation.constraints.Null;
 
 import java.util.List;
 import java.util.UUID;
@@ -12,7 +13,7 @@ public record BullDto(
         @NotBlank
         String name,
         @NotBlank
-        String stud,
+        String numRegister,
         @NotBlank
         String description,
         @NotBlank
@@ -21,8 +22,14 @@ public record BullDto(
         BreedDto breed,
         @NotNull
         UUID supplierId,
-
-        MediaFileDto image
+        @Null
+        MediaFileDto image,
+        @Null
+        MediaFileDto video,
+        @Null
+        MediaFileDto geneticEvaluation,
+        @Null
+        List<MediaFileDto> gallery
 
 ) {
 }
