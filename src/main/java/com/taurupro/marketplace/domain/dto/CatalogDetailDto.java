@@ -1,4 +1,6 @@
 package com.taurupro.marketplace.domain.dto;
+import jakarta.validation.constraints.Null;
+
 import java.util.List;
 
 public record CatalogDetailDto(
@@ -8,10 +10,14 @@ public record CatalogDetailDto(
         BreedDto breed,
         String birthDate,
         Boolean isFeature,
+        String description,
+        @Null
         MediaFileDto image,
+        @Null
         MediaFileDto video,
         List<MediaFileDto> gallery,
-        String description,
+        @Null
+        MediaFileDto geneticEvaluation,
         List<StrawCatalogDto> straws
 
 ) {
