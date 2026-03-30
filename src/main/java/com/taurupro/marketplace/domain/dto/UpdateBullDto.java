@@ -6,7 +6,7 @@ public record UpdateBullDto(
         @NotBlank
         String name,
         @NotBlank
-        String stud,
+        String numRegister,
         @NotBlank
         String breedId,
         @NotBlank

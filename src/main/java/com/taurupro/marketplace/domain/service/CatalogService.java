@@ -22,4 +22,8 @@ public class CatalogService {
     public CatalogDetailDto getDetailBySlug(String slug){
         return this.bullRepository.getBySlug(slug);
     }
+
+    public List<CatalogDto> getRecentBulls(Integer limit) {
+        return this.bullRepository.getRecentBulls(limit);
+    }
 }

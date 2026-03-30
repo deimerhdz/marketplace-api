@@ -1,14 +1,12 @@
 package com.taurupro.marketplace.web.controller;
 
-import com.taurupro.marketplace.domain.dto.UpdateBullImageDto;
+import com.taurupro.marketplace.domain.dto.*;
+import com.taurupro.marketplace.domain.enums.Resource;
 import jakarta.validation.Valid;
 import org.springframework.http.HttpStatus;
 import org.springframework.data.domain.Page;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import com.taurupro.marketplace.domain.dto.BullDto;
-import com.taurupro.marketplace.domain.dto.CreateBullDto;
-import com.taurupro.marketplace.domain.dto.UpdateBullDto;
 import com.taurupro.marketplace.domain.service.BullService;
 import com.taurupro.marketplace.persistence.model.UserMain;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -67,16 +65,27 @@ public class BullController {
         return ResponseEntity.status(HttpStatus.CREATED).body(this.bullService.update(id, supplierId, updateMovieDto));
     }
 
-
-    @PutMapping("/image/{id}")
+    @PutMapping("/update-resource/{id}")
     @PreAuthorize("hasAuthority('SUPPLIER')")
-    public ResponseEntity<BullDto> updateImage(@PathVariable UUID id,
-                                               @RequestBody @Valid UpdateBullImageDto dto,
+    public ResponseEntity<BullDto> updateVideo(@PathVariable UUID id,
+                                               @RequestBody @Valid ResourceDto dto,
+                                               @RequestParam(name = "resource", required = true, defaultValue = "") Resource resource,
                                                @AuthenticationPrincipal UserMain userMain) {
-
         UUID supplierId = userMain.getSupplierId();
+        BullDto updated = bullService.updateResource(id, supplierId, dto.files(),resource);
 
-        BullDto updated = bullService.updateImage(id, supplierId, dto);
+        return ResponseEntity.ok(updated);
+    }
+
+
+    @DeleteMapping("/resource/{id}")
+    @PreAuthorize("hasAuthority('SUPPLIER')")
+    public ResponseEntity<BullDto> deleteResource(   @PathVariable UUID id,
+                                                     @RequestParam(name = "resource", required = true, defaultValue = "") Resource resource,
+                                                     @RequestParam(name = "key", required = true, defaultValue = "") String key,
+                                                     @AuthenticationPrincipal UserMain userMain) {
+        UUID supplierId = userMain.getSupplierId();
+        BullDto updated = bullService.deleteResource(id, supplierId,resource, key);
 
         return ResponseEntity.ok(updated);
     }

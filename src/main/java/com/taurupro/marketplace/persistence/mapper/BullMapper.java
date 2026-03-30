@@ -17,7 +17,6 @@ public interface BullMapper {
     BullDto toDto(BullEntity entity);
 
     List<CatalogDto> toDto(Iterable<BullEntity> entities);
-
     CatalogDetailDto toCatalog(BullEntity entity);
 
     @InheritInverseConfiguration

@@ -1,7 +1,6 @@
 package com.taurupro.marketplace.persistence.entity;
 
 import com.taurupro.marketplace.persistence.model.MediaFile;
-import com.taurupro.marketplace.persistence.model.Pedigree;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -24,6 +23,7 @@ import java.util.UUID;
         @Index(name = "idx_bull_breed", columnList = "breedId"),
         @Index(name = "idx_bull_supplier", columnList = "supplierId"),
         @Index(name = "idx_bull_name", columnList = "name"),
+        @Index(name = "idx_bull_created_at", columnList = "createdAt")
 })
 public class BullEntity extends AuditableEntity {
     @Id
@@ -36,8 +36,8 @@ public class BullEntity extends AuditableEntity {
     @Column(nullable = false)
     private String slug;
 
-    @Column(nullable = false)
-    private String stud;
+    @Column(name = "num_register", nullable = false)
+    private String numRegister;
 
     @Column(name="breed_id" ,nullable = false)
     private UUID breedId;
@@ -54,8 +54,8 @@ public class BullEntity extends AuditableEntity {
     private MediaFile video;
 
     @JdbcTypeCode(SqlTypes.JSON)
-    @Column(nullable = true,columnDefinition = "jsonb")
-    private Pedigree pedigree;
+    @Column(name = "genetic_evaluation", nullable = true, columnDefinition = "jsonb")
+    private MediaFile geneticEvaluation ;
 
     @Column(nullable = false)
     private String description;

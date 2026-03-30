@@ -6,7 +6,7 @@ public record CreateBullDto(
         @NotBlank
         String name,
         @NotBlank
-        String stud,
+        String numRegister,
         @NotBlank
         String breedId,
         @NotBlank
